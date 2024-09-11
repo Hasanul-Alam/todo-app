@@ -159,13 +159,13 @@ function App() {
 
   return (
     <div className={`py-8 ${theme === "light" ? "bg-white" : "bg-slate-900"}`}>
-      <div className="w-[85%] mx-auto relative h-screen">
+      <div className="w-[85%] mx-auto relative min-h-screen">
         <h1
           className={`uppercase text-center text-black text-3xl font-semibold ${
             theme === "light" ? "text-black" : "text-white"
           }`}
         >
-          todo list
+          todo app
         </h1>
 
         {/* Upper portion */}
@@ -364,6 +364,7 @@ function App() {
             </div>
           </div>
         </div>
+        <p className="text-center text-xs mt-10">@ copyright Hasanul Alam 2024</p>
       </div>
     </div>
   );
