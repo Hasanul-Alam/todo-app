@@ -1,17 +1,49 @@
 import { useState } from "react";
 import "./App.css";
 import { useEffect } from "react";
+import { FaRegTrashAlt } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 
 function App() {
   const [openModal, setOpenModal] = useState(false);
   const [theme, setTheme] = useState("light");
   const [inputValue, setInputValue] = useState("");
   const [tasks, setTasks] = useState([]);
+  const [filterValue, setFilterValue] = useState("all");
 
   useEffect(() => {
     const tasks = localStorage.getItem("todos");
     setTasks(JSON.parse(tasks));
   }, []);
+
+  useEffect(() => {
+    filterTodos();
+  }, [filterValue]);
+
+  // Filter Tasks
+  const filterTodos = () => {
+    const allTodos = JSON.parse(localStorage.getItem("todos"));
+    if (filterValue === "completed") {
+      filterCompleted(allTodos);
+    } else if (filterValue === "active") {
+      filterActiveTodos(allTodos);
+    } else {
+      const allTodos = JSON.parse(localStorage.getItem("todos"));
+      setTasks(allTodos);
+    }
+  };
+
+  // Filter Active Todos
+  const filterActiveTodos = (allData) => {
+    const filteredItems = allData.filter((todo) => todo.completed === false);
+    setTasks(filteredItems);
+  };
+
+  // Filter Completed Todos
+  const filterCompleted = (allData) => {
+    const filteredItems = allData.filter((todo) => todo.completed === true);
+    setTasks(filteredItems);
+  };
 
   // Toggle Add Task Modal
   const toggleModal = () => {
@@ -42,7 +74,7 @@ function App() {
     // Generate an id
     const id = Math.floor(Math.random() * 100000000000);
 
-    if(inputValue){
+    if (inputValue) {
       const newItem = {
         id: id,
         task: inputValue,
@@ -51,9 +83,8 @@ function App() {
       const newData = [...tasks, newItem];
       setToLocalStorage(newData);
       setTasks(newData);
-    }
-    else{
-      alert('Write a task to add.');
+    } else {
+      alert("Write a task to add.");
     }
     setInputValue("");
   };
@@ -64,21 +95,38 @@ function App() {
       makeNewTask();
     } else if (event.key === "Enter" && buttonType === "search") {
       console.log("Search is clicked.");
-      
     }
   };
 
   // Handle Completed Task
   const handleCompleted = (id) => {
-    const allTodos = JSON.parse(localStorage.getItem('todos'));
-    allTodos.map(todo => {
-      if(todo.id === id){
+    const allTodos = JSON.parse(localStorage.getItem("todos"));
+    allTodos.map((todo) => {
+      if (todo.id === id) {
         todo.completed = !todo.completed;
         setToLocalStorage(allTodos);
-        setTasks(allTodos)
+        setTasks(allTodos);
       }
-    })
+    });
   };
+
+  // Handle Filter
+  const handleFilter = (e) => {
+    setFilterValue(e.target.value);
+  };
+
+  // Handle Delete Item
+  const handleDelete = (id) => {
+    console.log(id);
+    const storedItems = localStorage.getItem("todos");
+    if (storedItems) {
+      let todosArray = JSON.parse(storedItems);
+      const updatedTodos = todosArray.filter((todo) => todo.id !== id);
+      localStorage.setItem("todos", JSON.stringify(updatedTodos));
+      setTasks(updatedTodos);
+    }
+  };
+  
   return (
     <div className={`py-8 ${theme === "light" ? "bg-white" : "bg-slate-900"}`}>
       <div className="w-[85%] mx-auto relative h-screen">
@@ -117,13 +165,15 @@ function App() {
           <div className="flex items-center justify-center max-md:mt-5">
             {/* Filter Button */}
             <select
+              value={filterValue}
+              onChange={handleFilter}
               className={`select select-primary mx-10 max-md:me-10 max-md:ml-0 ${
                 theme === "light" ? "bg-white text-black" : "text-white"
               }`}
             >
-              <option>All</option>
-              <option>Active</option>
-              <option>Completed</option>
+              <option value={"all"}>All</option>
+              <option value={"active"}>Active</option>
+              <option value={"completed"}>Completed</option>
             </select>
 
             {/* Theme Controller */}
@@ -170,36 +220,56 @@ function App() {
         </div>
 
         {/* Task Portion */}
-        <ul>
-          {tasks === null
-            ? setTasks([])
-            : tasks.map((task) => (
-                <li key={task.id}>
-                  <div className="flex justify-center form-control">
-                    <label className="label cursor-pointer block">
-                      <input
-                        onChange={() => handleCompleted(task.id)}
-                        type="checkbox"
-                        checked= {task.completed}
-                        className="checkbox checkbox-primary"
-                      />
-                      <span
-                        className={`text-black mx-2 text-left ${
-                          theme === "light" ? "text-black" : "text-white"
-                        } ${task.completed ? 'line-through' : ''}`}
-                      >
-                        {task.task}
-                      </span>
-                    </label>
-                  </div>
-                </li>
-              ))}
-        </ul>
+        <div className="w-[520px] mx-auto max-md:w-full">
+          <ul>
+            {tasks === null
+              ? setTasks([])
+              : tasks.map((task) => (
+                  <li
+                    key={task.id}
+                    className={`border-b hover:border-indigo-400 my-5 transition duration-500 flex justify-between items-center cursor-pointer ${
+                      theme === "light" ? "border-gray-300" : "border-gray-800"
+                    }`}
+                  >
+                    <div className="flex justify-center form-control">
+                      <label className="label cursor-pointer block">
+                        <input
+                          onChange={() => handleCompleted(task.id)}
+                          type="checkbox"
+                          checked={task.completed}
+                          className="checkbox checkbox-primary"
+                        />
+                        <span
+                          className={`text-black mx-2 text-left ${
+                            theme === "light" ? "text-black" : "text-white"
+                          } ${task.completed ? "line-through" : ""}`}
+                        >
+                          {task.task}
+                        </span>
+                      </label>
+                    </div>
+                    <button
+                      onClick={() => handleDelete(task.id)}
+                      className={`btn bg-transparent border-0 hover:bg-transparent transition ${
+                        theme === "light"
+                          ? "hover:text-black"
+                          : "hover:text-white"
+                      }`}
+                    >
+                      <FaRegTrashAlt />
+                    </button>
+                  </li>
+                ))}
+          </ul>
+        </div>
 
         {/* Add Button & Modal*/}
-        <div className="absolute bottom-20 right-80 max-md:bottom-10 max-md:right-5">
-          <button onClick={toggleModal} className="btn btn-primary">
-            Add
+        <div className="fixed bottom-20 right-80 max-md:bottom-10 max-md:right-5">
+          <button
+            onClick={toggleModal}
+            className="btn btn-primary text-white rounded-full"
+          >
+            <FaPlus />
           </button>
 
           {/* Modal */}
