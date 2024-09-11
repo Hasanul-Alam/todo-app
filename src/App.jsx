@@ -16,8 +16,12 @@ function App() {
   const [searchText, setSearchTex] = useState("");
 
   useEffect(() => {
-    const tasks = localStorage.getItem("todos");
-    setTasks(JSON.parse(tasks));
+    const tasks = JSON.parse(localStorage.getItem("todos"));
+    if (tasks) {
+      setTasks(tasks);
+    } else {
+      setTasks([]);
+    }
   }, []);
 
   useEffect(() => {
@@ -72,8 +76,8 @@ function App() {
   };
 
   // Make a New Task & Set It To Local Storage
-  const makeNewTask = (e) => {
-    e.preventDefault();
+  const makeNewTask = (event) => {
+    event.preventDefault();
 
     // Generate an id
     const id = Math.floor(Math.random() * 100000000000);
@@ -84,9 +88,14 @@ function App() {
         task: inputValue,
         completed: false,
       };
-      const newData = [...tasks, newItem];
-      setToLocalStorage(newData);
-      setTasks(newData);
+      if (!tasks) {
+        const newData = [];
+        setTasks(newData);
+      } else {
+        const newData = [...tasks, newItem];
+        setToLocalStorage(newData);
+        setTasks(newData);
+      }
     } else {
       alert("Write a task to add.");
     }
@@ -364,7 +373,9 @@ function App() {
             </div>
           </div>
         </div>
-        <p className="text-center text-xs mt-10">@ copyright Hasanul Alam 2024</p>
+        <p className="text-center text-xs mt-10">
+          @ copyright Hasanul Alam 2024
+        </p>
       </div>
     </div>
   );
