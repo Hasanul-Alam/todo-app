@@ -1,16 +1,83 @@
 import { useState } from "react";
 import "./App.css";
+import { useEffect } from "react";
 
 function App() {
   const [openModal, setOpenModal] = useState(false);
   const [theme, setTheme] = useState("light");
+  const [inputValue, setInputValue] = useState("");
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    const tasks = localStorage.getItem("todos");
+    setTasks(JSON.parse(tasks));
+  }, []);
+
+  // Toggle Add Task Modal
   const toggleModal = () => {
     setOpenModal(!openModal);
   };
+
+  // Handle Theme Toggling
   const toggleTheme = () => {
     {
       theme === "light" ? setTheme("dark") : setTheme("light");
     }
+  };
+
+  // Handle Input Change
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value);
+  };
+
+  // Set Data To Local Storage
+  const setToLocalStorage = (todos) => {
+    localStorage.setItem("todos", JSON.stringify(todos));
+  };
+
+  // Make a New Task & Set It To Local Storage
+  const makeNewTask = (e) => {
+    e.preventDefault();
+
+    // Generate an id
+    const id = Math.floor(Math.random() * 100000000000);
+
+    if(inputValue){
+      const newItem = {
+        id: id,
+        task: inputValue,
+        completed: false,
+      };
+      const newData = [...tasks, newItem];
+      setToLocalStorage(newData);
+      setTasks(newData);
+    }
+    else{
+      alert('Write a task to add.');
+    }
+    setInputValue("");
+  };
+
+  // Handle Submit Button on Enter Press
+  const handleSubmitOnEnter = (event, buttonType) => {
+    if (event.key === "Enter" && buttonType === "add") {
+      makeNewTask();
+    } else if (event.key === "Enter" && buttonType === "search") {
+      console.log("Search is clicked.");
+      
+    }
+  };
+
+  // Handle Completed Task
+  const handleCompleted = (id) => {
+    const allTodos = JSON.parse(localStorage.getItem('todos'));
+    allTodos.map(todo => {
+      if(todo.id === id){
+        todo.completed = !todo.completed;
+        setToLocalStorage(allTodos);
+        setTasks(allTodos)
+      }
+    })
   };
   return (
     <div className={`py-8 ${theme === "light" ? "bg-white" : "bg-slate-900"}`}>
@@ -104,24 +171,33 @@ function App() {
 
         {/* Task Portion */}
         <ul>
-          <li>
-            <div className="flex justify-center items-center form-control">
-              <label className="label cursor-pointer">
-                <input type="checkbox" className="checkbox checkbox-primary" />
-                <span
-                  className={`text-black mx-2 ${
-                    theme === "light" ? "text-black" : "text-white"
-                  }`}
-                >
-                  Remember me
-                </span>
-              </label>
-            </div>
-          </li>
+          {tasks === null
+            ? setTasks([])
+            : tasks.map((task) => (
+                <li key={task.id}>
+                  <div className="flex justify-center form-control">
+                    <label className="label cursor-pointer block">
+                      <input
+                        onChange={() => handleCompleted(task.id)}
+                        type="checkbox"
+                        checked= {task.completed}
+                        className="checkbox checkbox-primary"
+                      />
+                      <span
+                        className={`text-black mx-2 text-left ${
+                          theme === "light" ? "text-black" : "text-white"
+                        } ${task.completed ? 'line-through' : ''}`}
+                      >
+                        {task.task}
+                      </span>
+                    </label>
+                  </div>
+                </li>
+              ))}
         </ul>
 
         {/* Add Button & Modal*/}
-        <div className="absolute bottom-20 right-80 max-md:bottom-10 right-5">
+        <div className="absolute bottom-20 right-80 max-md:bottom-10 max-md:right-5">
           <button onClick={toggleModal} className="btn btn-primary">
             Add
           </button>
@@ -158,33 +234,42 @@ function App() {
                 </button>
               </div>
 
-              <div className="my-4">
-                <input
-                  type="text"
-                  placeholder="Eg: Get up at 7:00 am"
-                  className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    theme === "light"
-                      ? "bg-white text-black border-primary placeholder:text-slate-500"
-                      : "border-white bg-slate-900 text-white placeholder:text-slate-400"
-                  }`}
-                />
-              </div>
+              <form action="" onSubmit={makeNewTask}>
+                <div className="my-4">
+                  <input
+                    type="text"
+                    placeholder="Eg: Get up at 7:00 am"
+                    onChange={handleInputChange}
+                    onKeyPress={(e) => handleSubmitOnEnter(e, "add")}
+                    value={inputValue}
+                    className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      theme === "light"
+                        ? "bg-white text-black border-primary placeholder:text-slate-500"
+                        : "border-white bg-slate-900 text-white placeholder:text-slate-400"
+                    }`}
+                  />
+                </div>
 
-              <div className="flex justify-end space-x-2">
-                <button
-                  onClick={toggleModal}
-                  className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-700"
-                  id="closeModal"
-                >
-                  Close
-                </button>
-                <button
-                  onClick={toggleModal}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                >
-                  Apply
-                </button>
-              </div>
+                <div className="flex justify-end space-x-2">
+                  <button
+                    type="reset"
+                    onClick={toggleModal}
+                    className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-700"
+                    id="closeModal"
+                  >
+                    Close
+                  </button>
+                  <button
+                    type="submit"
+                    onClick={() => {
+                      toggleModal();
+                    }}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                  >
+                    Add Task
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
