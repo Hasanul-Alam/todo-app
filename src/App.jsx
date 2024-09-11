@@ -7,11 +7,13 @@ import { IoSunny } from "react-icons/io5";
 import { LuMoon } from "react-icons/lu";
 
 function App() {
+  // All States Are Here
   const [openModal, setOpenModal] = useState(false);
   const [theme, setTheme] = useState("light");
   const [inputValue, setInputValue] = useState("");
   const [tasks, setTasks] = useState([]);
   const [filterValue, setFilterValue] = useState("all");
+  const [searchText, setSearchTex] = useState("");
 
   useEffect(() => {
     const tasks = localStorage.getItem("todos");
@@ -96,7 +98,7 @@ function App() {
     if (event.key === "Enter" && buttonType === "add") {
       makeNewTask();
     } else if (event.key === "Enter" && buttonType === "search") {
-      console.log("Search is clicked.");
+      handleSearch();
     }
   };
 
@@ -129,6 +131,32 @@ function App() {
     }
   };
 
+  // Handle Search Text
+  const handleSearchText = (e) => {
+    const text = e.target.value;
+    setSearchTex(text);
+  };
+
+  // Handle Search
+  const handleSearch = () => {
+    if (searchText === "") {
+      const allData = JSON.parse(localStorage.getItem("todos"));
+      setTasks(allData);
+    } else {
+      const searchedItems = [];
+      console.log(searchText);
+      tasks.map((task) => {
+        const searchResult = task.task
+          .toLowerCase()
+          .includes(searchText.toLowerCase());
+        if (searchResult) {
+          searchedItems.push(task);
+        }
+      });
+      setTasks(searchedItems);
+    }
+  };
+
   return (
     <div className={`py-8 ${theme === "light" ? "bg-white" : "bg-slate-900"}`}>
       <div className="w-[85%] mx-auto relative h-screen">
@@ -146,6 +174,8 @@ function App() {
           <div className="flex w-[40%] max-md:w-full justify-center">
             <input
               type="text"
+              onKeyPress={(e) => handleSubmitOnEnter(e, "search")}
+              onChange={handleSearchText}
               placeholder="Type here"
               className={`input  text-black w-full ${
                 theme === "light"
@@ -154,6 +184,7 @@ function App() {
               }`}
             />
             <button
+              onClick={handleSearch}
               className={`btn btn-outline mx-3 ${
                 theme === "light"
                   ? "btn-primary"
@@ -198,45 +229,58 @@ function App() {
 
         {/* Task Portion */}
         <div className="w-[520px] mx-auto max-md:w-full">
-          <ul>
-            {tasks === null
-              ? setTasks([])
-              : tasks.map((task) => (
-                  <li
-                    key={task.id}
-                    className={`border-b hover:border-indigo-400 my-5 transition duration-500 flex justify-between items-center cursor-pointer ${
-                      theme === "light" ? "border-gray-300" : "border-gray-800"
+          {/* {console.log(tasks)} */}
+          <ul
+            className={` ${
+              tasks === null || tasks.length === 0
+                ? "flex justify-center items-center"
+                : ""
+            }`}
+          >
+            {tasks === null || tasks.length === 0 ? (
+              <img
+                className="bg-transparent"
+                src="https://i.ibb.co.com/xCg3d7W/Detective-check-footprint-1-2x-removebg-preview.png"
+                alt=""
+              />
+            ) : (
+              tasks.map((task) => (
+                <li
+                  key={task.id}
+                  className={`border-b hover:border-indigo-400 my-5 transition duration-500 flex justify-between items-center cursor-pointer ${
+                    theme === "light" ? "border-gray-300" : "border-gray-800"
+                  }`}
+                >
+                  <div className="flex justify-center form-control">
+                    <label className="label cursor-pointer block items-center flex">
+                      <input
+                        onChange={() => handleCompleted(task.id)}
+                        type="checkbox"
+                        checked={task.completed}
+                        className="checkbox checkbox-primary"
+                      />
+                      <span
+                        className={`text-black mx-2 text-left ${
+                          theme === "light" ? "text-black" : "text-white"
+                        } ${task.completed ? "line-through" : ""}`}
+                      >
+                        {task.task}
+                      </span>
+                    </label>
+                  </div>
+                  <button
+                    onClick={() => handleDelete(task.id)}
+                    className={`btn bg-transparent border-0 hover:bg-transparent transition ${
+                      theme === "light"
+                        ? "hover:text-black"
+                        : "hover:text-white"
                     }`}
                   >
-                    <div className="flex justify-center form-control">
-                      <label className="label cursor-pointer block items-center flex">
-                        <input
-                          onChange={() => handleCompleted(task.id)}
-                          type="checkbox"
-                          checked={task.completed}
-                          className="checkbox checkbox-primary"
-                        />
-                        <span
-                          className={`text-black mx-2 text-left ${
-                            theme === "light" ? "text-black" : "text-white"
-                          } ${task.completed ? "line-through" : ""}`}
-                        >
-                          {task.task}
-                        </span>
-                      </label>
-                    </div>
-                    <button
-                      onClick={() => handleDelete(task.id)}
-                      className={`btn bg-transparent border-0 hover:bg-transparent transition ${
-                        theme === "light"
-                          ? "hover:text-black"
-                          : "hover:text-white"
-                      }`}
-                    >
-                      <FaRegTrashAlt />
-                    </button>
-                  </li>
-                ))}
+                    <FaRegTrashAlt />
+                  </button>
+                </li>
+              ))
+            )}
           </ul>
         </div>
 
