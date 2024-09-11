@@ -8,7 +8,9 @@ function App() {
     setOpenModal(!openModal);
   };
   const toggleTheme = () => {
-    {theme === 'light' ? setTheme('dark') : setTheme('light')}
+    {
+      theme === "light" ? setTheme("dark") : setTheme("light");
+    }
   };
   return (
     <div className={`py-8 ${theme === "light" ? "bg-white" : "bg-slate-900"}`}>
@@ -54,7 +56,11 @@ function App() {
           </select>
 
           {/* Theme Controller */}
-          <label className="flex cursor-pointer gap-2">
+          <label
+            className={`flex cursor-pointer gap-2 ${
+              theme === "light" ? "text-slate-700" : "text-gray-200"
+            }`}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"
@@ -117,18 +123,24 @@ function App() {
 
           {/* Modal */}
           <div
-            className={`fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 ${
+            className={`fixed inset-0 flex items-center justify-center bg-opacity-50 ${
               openModal ? "block" : "hidden"
             }`}
           >
-            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <div className={`rounded-lg shadow-lg p-6 w-full max-w-md ${
+              theme === 'light' ? "bg-gray-200" : "bg-slate-700"
+            }`}>
               <div className="flex justify-between items-center border-b pb-3">
-                <h3 className="text-xl font-semibold text-black">
-                  Enter Details
+                <h3 className={`text-xl font-semibold text-black ${
+              theme === 'light' ? "text-black" : "text-white"
+            }`}>
+                  Enter Task
                 </h3>
                 <button
                   onClick={toggleModal}
-                  className="text-gray-500 hover:text-gray-700"
+                  className={`text-gray-500 ${
+                    theme === 'light' ? "text-black hover:text-gray-700" : "text-white hover:text-slate-300"
+                  }`}
                   id="closeModal"
                 >
                   &#10005;
@@ -138,15 +150,17 @@ function App() {
               <div className="my-4">
                 <input
                   type="text"
-                  placeholder="Type something..."
-                  className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-black"
+                  placeholder="Eg: Get up at 7:00 am"
+                  className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    theme === 'light' ? "bg-white text-black border-primary placeholder:text-slate-500" : "border-white bg-slate-900 text-white placeholder:text-slate-400"
+                  }`}
                 />
               </div>
 
               <div className="flex justify-end space-x-2">
                 <button
                   onClick={toggleModal}
-                  className="px-4 py-2 bg-gray-400 text-white rounded-md hover:bg-gray-500"
+                  className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-700"
                   id="closeModal"
                 >
                   Close
