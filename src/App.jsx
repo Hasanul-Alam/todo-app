@@ -3,25 +3,51 @@ import "./App.css";
 
 function App() {
   const [openModal, setOpenModal] = useState(false);
+  const [theme, setTheme] = useState("light");
   const toggleModal = () => {
     setOpenModal(!openModal);
   };
+  const toggleTheme = () => {
+    {theme === 'light' ? setTheme('dark') : setTheme('light')}
+  };
   return (
-    <div className="bg-white py-8">
+    <div className={`py-8 ${theme === "light" ? "bg-white" : "bg-slate-900"}`}>
       <div className="w-[85%] mx-auto relative h-screen">
-        <h1 className="uppercase text-center text-black text-3xl font-semibold">todo list</h1>
+        <h1
+          className={`uppercase text-center text-black text-3xl font-semibold ${
+            theme === "light" ? "text-black" : "text-white"
+          }`}
+        >
+          todo list
+        </h1>
 
         {/* Upper portion */}
         <div className="flex justify-center items-center mt-8 mb-5">
           <input
             type="text"
             placeholder="Type here"
-            className="input input-bordered input-primary bg-white text-black w-[40%]"
+            className={`input  text-black w-[40%] ${
+              theme === "light"
+                ? "bg-white text-black input-primary input-bordered"
+                : "text-white bg-slate-900 border-white input-bordered"
+            }`}
           />
-          <button className="btn btn-outline btn-primary mx-3">Search</button>
+          <button
+            className={`btn btn-outline mx-3 ${
+              theme === "light"
+                ? "btn-primary"
+                : "border-primary text-white hover:bg-primary"
+            }`}
+          >
+            Search
+          </button>
 
           {/* Filter Button */}
-          <select className="select select-primary bg-white text-black mx-10">
+          <select
+            className={`select select-primary mx-10 ${
+              theme === "light" ? "bg-white text-black" : "text-white"
+            }`}
+          >
             <option>All</option>
             <option>Active</option>
             <option>Completed</option>
@@ -47,6 +73,7 @@ function App() {
               type="checkbox"
               value="synthwave"
               className="toggle theme-controller"
+              onClick={toggleTheme}
             />
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -69,11 +96,14 @@ function App() {
           <li>
             <div className="flex justify-center items-center form-control">
               <label className="label cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="checkbox checkbox-primary"
-                />
-                <span className="text-black mx-2">Remember me</span>
+                <input type="checkbox" className="checkbox checkbox-primary" />
+                <span
+                  className={`text-black mx-2 ${
+                    theme === "light" ? "text-black" : "text-white"
+                  }`}
+                >
+                  Remember me
+                </span>
               </label>
             </div>
           </li>
@@ -93,7 +123,9 @@ function App() {
           >
             <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
               <div className="flex justify-between items-center border-b pb-3">
-                <h3 className="text-xl font-semibold text-black">Enter Details</h3>
+                <h3 className="text-xl font-semibold text-black">
+                  Enter Details
+                </h3>
                 <button
                   onClick={toggleModal}
                   className="text-gray-500 hover:text-gray-700"
