@@ -89,8 +89,9 @@ function App() {
         completed: false,
       };
       if (!tasks) {
-        const newData = [];
+        const newData = [newItem];
         setTasks(newData);
+        setToLocalStorage(newData);
       } else {
         const newData = [...tasks, newItem];
         setToLocalStorage(newData);
