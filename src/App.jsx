@@ -211,7 +211,7 @@ function App() {
               value={filterValue}
               onChange={handleFilter}
               className={`select select-primary mx-10 max-md:me-10 max-md:ml-0 ${
-                theme === "light" ? "bg-white text-black" : "text-white"
+                theme === "light" ? "bg-white text-black" : "bg-slate-900 text-white"
               }`}
             >
               <option value={"all"}>All</option>
